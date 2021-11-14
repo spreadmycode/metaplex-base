@@ -1759,8 +1759,6 @@ name = "nft-candy-machine"
 version = "0.1.0"
 dependencies = [
  "anchor-lang",
- "getrandom 0.2.3",
- "rand 0.8.4",
 ]
 
 [[package]]
