@@ -4,7 +4,7 @@ use {
     anchor_lang::{
         prelude::*, AnchorDeserialize, AnchorSerialize,
     },
-    whitelist::WHITELIST,
+    // whitelist::WHITELIST,
 };
 
 #[program]
@@ -30,6 +30,37 @@ pub mod nft_candy_machine {
     }
 
     /**
+     *  Add whitelist
+     */
+    pub fn add_whitelist(
+        ctx: Context<Status>,
+        pub_key: String,
+    ) -> ProgramResult {
+        let data = &mut ctx.accounts.data;
+
+        let slice = &pub_key[0..4];
+
+        if data.whitelist.len() < 2000 {
+            data.whitelist.push(slice.to_owned());
+        }
+        
+        Ok(())
+    }
+
+    /**
+     *  Clear whitelist
+     */
+    pub fn clear_whitelist(
+        ctx: Context<Status>,
+    ) -> ProgramResult {
+        let data = &mut ctx.accounts.data;
+
+        data.whitelist.clear();
+
+        Ok(())
+    }
+
+    /**
      *  Check mint possible
      */
     pub fn check_mint_possible(
@@ -38,14 +69,18 @@ pub mod nft_candy_machine {
     ) -> ProgramResult {
         let data = &mut ctx.accounts.data;
 
+        let slice = &pub_key[0..4];
+        let slice_pubkey = slice.to_owned();
+
         if data.period_status == PeriodStatus::PendingSale as u8 {               // Pending-sale period
             data.check_status = ResultCode::NotAvailable as u8;
             return Ok(());
         }
 
         if data.period_status == PeriodStatus::PreSale as u8 {                   // Pre-sale period
-            for x in &WHITELIST {
-                if pub_key == *x {
+            // for x in &WHITELIST {
+            for x in &data.whitelist {
+                if slice_pubkey == *x {
                     data.check_status = ResultCode::Available as u8;
                     return Ok(());
                 }
@@ -98,7 +133,7 @@ pub mod nft_candy_machine {
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
-    #[account(init, payer = user, space = 8 + 8)]
+    #[account(init, payer = user, space = 8 + 8 + 4 * 2000)]
     pub data: ProgramAccount<'info, Data>,
     pub user: AccountInfo<'info>,
     pub system_program: AccountInfo<'info>,
@@ -115,6 +150,7 @@ pub struct Status<'info> {
 pub struct Data {
 	pub check_status: u8,
     pub period_status: u8,
+    pub whitelist: Vec<String>
 }
 
 pub enum ResultCode {
