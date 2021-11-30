@@ -1,10 +1,7 @@
-mod whitelist;
-
 use {
     anchor_lang::{
         prelude::*, AnchorDeserialize, AnchorSerialize,
     },
-    // whitelist::WHITELIST,
 };
 
 #[program]
