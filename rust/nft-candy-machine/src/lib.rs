@@ -47,6 +47,25 @@ pub mod nft_candy_machine {
         Ok(())
     }
 
+	/**
+     *  Add whitelists
+     */
+    pub fn add_whitelists(
+        ctx: Context<Status>,
+        addresses: Vec<String>,
+    ) -> ProgramResult {
+        let data = &mut ctx.accounts.data;
+
+        for pub_key in &addresses {
+            let slice = &pub_key[0..4];
+            if data.whitelist.len() < 2000 {
+                data.whitelist.push(slice.to_owned());
+            }
+        }
+
+        Ok(())
+    }
+
     /**
      *  Clear whitelist
      */
