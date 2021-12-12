@@ -133,6 +133,10 @@ pub mod nft_candy_machine {
     ) -> ProgramResult {
         let data = &mut ctx.accounts.data;
 
+		if data.period_status == PeriodStatus::PendingSale as u8 {
+            data.period_status = PeriodStatus::PreSale as u8;
+        }
+
         if data.period_status == PeriodStatus::PreSale as u8 {
             data.period_status = PeriodStatus::PostSale as u8;
         }
